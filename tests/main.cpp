@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 
+#include "catch2/catch_session.hpp"
 #include "catch2/catch_test_macros.hpp"
 
 #include "BinaryTree.hxx"
@@ -73,4 +74,9 @@ TEST_CASE("Binary tree traversals", "[binary_tree]")
   REQUIRE(TestVisitPreOrder() == "'1' '2' '4' '5' '3' '6' '7' ");
   REQUIRE(TestVisitInOrder() == "'4' '2' '5' '1' '6' '3' '7' ");
   REQUIRE(TestVisitPostOrder() == "'4' '5' '2' '6' '7' '3' '1' ");
+}
+
+int main(int argc, char *argv[])
+{
+  return Catch::Session().run(argc, argv);
 }

@@ -1,0 +1,12 @@
+# VS Code
+.vscode/
+
+# Dependencies
+vcpkg_installed/
+
+# Build
+*.exe
+*.o
+*.obj
+*.pdb
+*.dll

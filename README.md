@@ -1,6 +1,6 @@
 # Grove
 
-Generic C++ header only library for trees and tries.
+Generic C++ header only library for trees and tries. Requires C++ 20 or higher.
 
 ## Overview
 

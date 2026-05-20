@@ -139,6 +139,8 @@ namespace Grove
 #pragma endregion
     };
 
+#pragma region Binary Tree Creators
+
     template <typename T>
     Node<T> *GenerateBinaryTree(const vector<T> &elements)
     {
@@ -161,6 +163,20 @@ namespace Grove
     }
 
     template <typename T>
+    Node<T> *CopyBinaryTree(const Node<T> *root)
+    {
+        if (!root)
+            return nullptr;
+        Node<T> *newNode = new Node<T>{root->data, nullptr, nullptr};
+        newNode->left = CopyBinaryTree(root->left);
+        newNode->right = CopyBinaryTree(root->right);
+        return newNode;
+    }
+
+#pragma endregion
+
+#pragma region Destructors
+    template <typename T>
     void DeleteBinaryTree(Node<T> *root)
     {
         if (root)
@@ -170,6 +186,34 @@ namespace Grove
             delete root;
         }
     }
+
+    template <typename T>
+    bool DeleteNodeFromBinarySearchTree(Node<T> *&root, const T &value)
+    {
+        if (!root)
+            return false;
+        if (root->data == value)
+        {
+            Node<T> *temp = root;
+            if (root->left && root->right)
+            {
+                Node<T> *successor = root->right;
+                while (successor->left)
+                    successor = successor->left;
+                root->data = successor->data;
+                DeleteNodeFromBinarySearchTree(root->right, successor->data);
+            }
+            else
+            {
+                root = root->left ? root->left : root->right;
+                delete temp;
+            }
+            return true;
+        }
+        return DeleteNodeFromBinarySearchTree(root->left, value) || DeleteNodeFromBinarySearchTree(root->right, value);
+    }
+
+#pragma endregion
 
 #pragma region Binary Search Tree
 

@@ -141,16 +141,17 @@ namespace Grove
 
 #pragma region Binary Tree Creators
 
-    template <typename T>
-    Node<T> *GenerateBinaryTree(const vector<T> &elements)
+    template <typename T, typename InputIt>
+    Node<T> *GenerateBinaryTree(InputIt first, InputIt last)
     {
-        const size_t n{elements.size()};
+        vector<Node<T> *> nodes;
+        for (; first != last; ++first)
+            nodes.push_back(new Node<T>{*first, nullptr, nullptr});
+
+        const size_t n{nodes.size()};
         if (n == 0)
             return nullptr;
-        vector<Node<T> *> nodes;
-        nodes.reserve(elements.size());
-        for (const auto &element : elements)
-            nodes.push_back(new Node<T>{element, nullptr, nullptr});
+
         for (size_t i{0}; i < n; ++i)
         {
             if (const size_t leftIndex = 2 * i + 1; leftIndex < n)
@@ -160,6 +161,18 @@ namespace Grove
         }
 
         return nodes[0];
+    }
+
+    template <typename T>
+    Node<T> *GenerateBinaryTree(initializer_list<T> &&elements)
+    {
+        return GenerateBinaryTree<T>(elements.begin(), elements.end());
+    }
+
+    template <typename T>
+    Node<T> *GenerateBinaryTree(const vector<T> &elements)
+    {
+        return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>

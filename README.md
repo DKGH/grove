@@ -6,6 +6,11 @@ Generic C++ header only library for trees and tries. Requires C++ 20 or higher.
 
 `Grove` provides header-only implementations for tree and trie data structures in C++.
 
+## Supports
+
+- Binary Trees
+- Binary Search Trees
+
 ## Usage
 
 Include the headers from the `headers/` directory in your project.

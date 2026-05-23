@@ -8,11 +8,11 @@ using namespace std;
 namespace Grove
 {
   template <typename T>
-  struct Node
+  struct BinaryNode
   {
     T data;
-    Node<T> *left{nullptr};
-    Node<T> *right{nullptr};
+    BinaryNode<T> *left{nullptr};
+    BinaryNode<T> *right{nullptr};
 
     bool IsLeaf() const noexcept
     {
@@ -24,10 +24,10 @@ namespace Grove
     vector<T> GetLevelOrder() const
     {
       vector<T> result;
-      vector<const Node<T> *> queue{this};
+      vector<const BinaryNode<T> *> queue{this};
       while (!queue.empty())
       {
-        const Node<T> *current = queue.front();
+        const BinaryNode<T> *current = queue.front();
         queue.erase(queue.begin());
         result.push_back(current->data);
         if (current->left)
@@ -99,10 +99,10 @@ namespace Grove
 
     void VisitLevelOrder(const function<void(const T &)> &visitor) const
     {
-      vector<const Node<T> *> queue{this};
+      vector<const BinaryNode<T> *> queue{this};
       while (!queue.empty())
       {
-        const Node<T> *current = queue.front();
+        const BinaryNode<T> *current = queue.front();
         queue.erase(queue.begin());
         visitor(current->data);
         if (current->left)

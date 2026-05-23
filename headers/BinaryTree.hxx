@@ -5,7 +5,7 @@
 #include <functional>
 #include <vector>
 
-#include "Node.hxx"
+#include "BinaryNode.hxx"
 
 using namespace std;
 
@@ -14,11 +14,11 @@ namespace Grove
 #pragma region Binary Tree Creators
 
     template <typename T, typename InputIt>
-    Node<T> *GenerateBinaryTree(InputIt first, InputIt last)
+    BinaryNode<T> *GenerateBinaryTree(InputIt first, InputIt last)
     {
-        vector<Node<T> *> nodes;
+        vector<BinaryNode<T> *> nodes;
         for (; first != last; ++first)
-            nodes.push_back(new Node<T>{*first, nullptr, nullptr});
+            nodes.push_back(new BinaryNode<T>{*first, nullptr, nullptr});
 
         const size_t n{nodes.size()};
         if (n == 0)
@@ -36,23 +36,23 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *GenerateBinaryTree(initializer_list<T> &&elements)
+    BinaryNode<T> *GenerateBinaryTree(initializer_list<T> &&elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    Node<T> *GenerateBinaryTree(const vector<T> &elements)
+    BinaryNode<T> *GenerateBinaryTree(const vector<T> &elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    Node<T> *CopyBinaryTree(const Node<T> *root)
+    BinaryNode<T> *CopyBinaryTree(const BinaryNode<T> *root)
     {
         if (!root)
             return nullptr;
-        Node<T> *newNode = new Node<T>{root->data, nullptr, nullptr};
+        BinaryNode<T> *newNode = new BinaryNode<T>{root->data, nullptr, nullptr};
         newNode->left = CopyBinaryTree(root->left);
         newNode->right = CopyBinaryTree(root->right);
         return newNode;
@@ -62,7 +62,7 @@ namespace Grove
 
 #pragma region Destructors
     template <typename T>
-    void DeleteBinaryTree(Node<T> *root)
+    void DeleteBinaryTree(BinaryNode<T> *root)
     {
         if (root)
         {
@@ -73,16 +73,16 @@ namespace Grove
     }
 
     template <typename T>
-    bool DeleteNodeFromBinarySearchTree(Node<T> *&root, const T &value)
+    bool DeleteNodeFromBinarySearchTree(BinaryNode<T> *&root, const T &value)
     {
         if (!root)
             return false;
         if (root->data == value)
         {
-            Node<T> *temp = root;
+            BinaryNode<T> *temp = root;
             if (root->left && root->right)
             {
-                Node<T> *successor = root->right;
+                BinaryNode<T> *successor = root->right;
                 while (successor->left)
                     successor = successor->left;
                 root->data = successor->data;
@@ -103,11 +103,11 @@ namespace Grove
 #pragma region Binary Search Tree
 
     template <typename T>
-    void InsertIntoBinarySearchTree(Node<T> *&root, const T &value)
+    void InsertIntoBinarySearchTree(BinaryNode<T> *&root, const T &value)
     {
         if (!root)
         {
-            root = new Node<T>{value, nullptr, nullptr};
+            root = new BinaryNode<T>{value, nullptr, nullptr};
             return;
         }
         if (value < root->data)
@@ -117,25 +117,25 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
+    BinaryNode<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
     {
-        Node<T> *root = nullptr;
+        BinaryNode<T> *root = nullptr;
         for (const T &element : elements)
             InsertIntoBinarySearchTree(root, element);
         return root;
     }
 
     template <typename T>
-    Node<T> *GenerateBinarySearchTree(const Node<T> *node)
+    BinaryNode<T> *GenerateBinarySearchTree(const BinaryNode<T> *node)
     {
-        Node<T> *root = nullptr;
+        BinaryNode<T> *root = nullptr;
         node->VisitInOrder([&](const T &value)
                            { InsertIntoBinarySearchTree(root, value); });
         return root;
     }
 
     template <typename T>
-    bool IsBinarySearchTree(const Node<T> *node)
+    bool IsBinarySearchTree(const BinaryNode<T> *node)
     {
         if (!node)
             return true;
@@ -147,12 +147,12 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *BinarySearch(const Node<T> *root, const T &value)
+    BinaryNode<T> *BinarySearch(const BinaryNode<T> *root, const T &value)
     {
         if (!root)
             return nullptr;
         if (root->data == value)
-            return const_cast<Node<T> *>(root);
+            return const_cast<BinaryNode<T> *>(root);
         return value < root->data
                    ? BinarySearch(root->left, value)
                    : BinarySearch(root->right, value);

@@ -14,7 +14,7 @@ Generic C++ header only library for trees and tries. Requires C++ 20 or higher.
 
 ## Usage
 
-Include the headers from the `headers/` directory in your project.
+Include the headers from the `headers/` directory in your project. For example:
 
 ```cpp
 #include "headers/BinaryTree.hxx"

@@ -231,22 +231,35 @@ namespace Grove
 #pragma region Binary Search Tree
 
     template <typename T>
+    void InsertIntoBinarySearchTree(Node<T> *&root, const T &value)
+    {
+        if (!root)
+        {
+            root = new Node<T>{value, nullptr, nullptr};
+            return;
+        }
+        if (value < root->data)
+            InsertIntoBinarySearchTree(root->left, value);
+        else
+            InsertIntoBinarySearchTree(root->right, value);
+    }
+
+    template <typename T>
     Node<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
     {
-        vector<T> sortedElements{elements};
-        sort(sortedElements.begin(), sortedElements.end());
-        return GenerateBinaryTree(sortedElements);
+        Node<T> *root = nullptr;
+        for (const T &element : elements)
+            InsertIntoBinarySearchTree(root, element);
+        return root;
     }
 
     template <typename T>
     Node<T> *GenerateBinarySearchTree(const Node<T> *node)
     {
-        if (!node)
-            return nullptr;
-        vector<T> elements;
-        node->VisitInOrder([&elements](const T &value)
-                           { elements.push_back(value); });
-        return GenerateBinaryTree(elements);
+        Node<T> *root = nullptr;
+        node->VisitInOrder([&](const T &value)
+                           { InsertIntoBinarySearchTree(root, value); });
+        return root;
     }
 
     template <typename T>

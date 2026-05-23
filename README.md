@@ -10,6 +10,7 @@ Generic C++ header only library for trees and tries. Requires C++ 20 or higher.
 
 - Binary Trees
 - Binary Search Trees
+- Segment Trees
 
 ## Usage
 

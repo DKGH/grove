@@ -7,6 +7,7 @@
 
 #include "BinaryTree/traversal.hxx"
 #include "BinaryTree/bst.hxx"
+#include "BinaryTree/segmentTrees.hxx"
 
 int main(int argc, char *argv[])
 {

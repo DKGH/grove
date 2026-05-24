@@ -20,6 +20,8 @@ Include the headers from the `headers/` directory in your project. For example:
 
 ```cpp
 #include "headers/BinaryTree.hxx"
+
+shared_ptr<BinaryTree> tree = make_shared<BinaryTree>(Grove::GenerateBinaryTree({1, 2, 3, 4, 5, 6, 7}));
 ```
 
 Then use the library types and functions directly in your code.

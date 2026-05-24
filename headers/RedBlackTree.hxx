@@ -17,14 +17,15 @@ namespace Grove
   template <typename T>
   struct RedBlackNodeData
   {
-    T data;
-    Color color{Color::Red};
+    T Data;
+    Color Color{Color::Red};
   };
 
   template <typename T>
   class RedBlackTree
   {
-    BinaryNode<RedBlackNodeData<T>> *root{nullptr};
+    using Node = BinaryNode<RedBlackNodeData<T>>;
+    Node *root{nullptr};
 
   public:
     RedBlackTree() = default;
@@ -48,7 +49,6 @@ namespace Grove
 
     void Insert(const T &value)
     {
-      using Node = BinaryNode<RedBlackNodeData<T>>;
       Node *z = new Node{RedBlackNodeData<T>{value, Color::Red}, nullptr, nullptr, nullptr};
       Node *y = nullptr;
       Node *x = root;
@@ -56,19 +56,19 @@ namespace Grove
       while (x)
       {
         y = x;
-        if (value < x->data.data)
-          x = x->left;
+        if (value < x->Value.Data)
+          x = x->Left;
         else
-          x = x->right;
+          x = x->Right;
       }
 
-      z->parent = y;
+      z->Parent = y;
       if (!y)
         root = z;
-      else if (value < y->data.data)
-        y->left = z;
+      else if (value < y->Value.Data)
+        y->Left = z;
       else
-        y->right = z;
+        y->Right = z;
 
       InsertFixup(z);
     }
@@ -81,22 +81,22 @@ namespace Grove
       vector<T> result;
       result.reserve(nodes.size());
       for (const auto &n : nodes)
-        result.push_back(n.data);
+        result.push_back(n.Data);
       return result;
     }
 
   private:
-    BinaryNode<RedBlackNodeData<T>> *FindNode(const T &value) const noexcept
+    Node *FindNode(const T &value) const noexcept
     {
-      auto *current = root;
+      Node *current = root;
       while (current)
       {
-        if (value == current->data.data)
+        if (value == current->Value.Data)
           return current;
-        if (value < current->data.data)
-          current = current->left;
+        if (value < current->Value.Data)
+          current = current->Left;
         else
-          current = current->right;
+          current = current->Right;
       }
       return nullptr;
     }
@@ -104,112 +104,112 @@ namespace Grove
     void LeftRotate(BinaryNode<RedBlackNodeData<T>> *x)
     {
       using Node = BinaryNode<RedBlackNodeData<T>>;
-      Node *y = x->right;
+      Node *y = x->Right;
       if (!y)
         return;
-      x->right = y->left;
-      if (y->left)
-        y->left->parent = x;
-      y->parent = x->parent;
-      if (!x->parent)
+      x->Right = y->Left;
+      if (y->Left)
+        y->Left->Parent = x;
+      y->Parent = x->Parent;
+      if (!x->Parent)
         root = y;
-      else if (x == x->parent->left)
-        x->parent->left = y;
+      else if (x == x->Parent->Left)
+        x->Parent->Left = y;
       else
-        x->parent->right = y;
-      y->left = x;
-      x->parent = y;
+        x->Parent->Right = y;
+      y->Left = x;
+      x->Parent = y;
     }
 
     void RightRotate(BinaryNode<RedBlackNodeData<T>> *y)
     {
       using Node = BinaryNode<RedBlackNodeData<T>>;
-      Node *x = y->left;
+      Node *x = y->Left;
       if (!x)
         return;
-      y->left = x->right;
-      if (x->right)
-        x->right->parent = y;
-      x->parent = y->parent;
-      if (!y->parent)
+      y->Left = x->Right;
+      if (x->Right)
+        x->Right->Parent = y;
+      x->Parent = y->Parent;
+      if (!y->Parent)
         root = x;
-      else if (y == y->parent->right)
-        y->parent->right = x;
+      else if (y == y->Parent->Right)
+        y->Parent->Right = x;
       else
-        y->parent->left = x;
-      x->right = y;
-      y->parent = x;
+        y->Parent->Left = x;
+      x->Right = y;
+      y->Parent = x;
     }
 
     void InsertFixup(BinaryNode<RedBlackNodeData<T>> *z)
     {
       using Node = BinaryNode<RedBlackNodeData<T>>;
-      while (z->parent && z->parent->data.color == Color::Red)
+      while (z->Parent && z->Parent->Value.Color == Color::Red)
       {
-        Node *parent = z->parent;
-        Node *grand = parent->parent;
+        Node *parent = z->Parent;
+        Node *grand = parent->Parent;
         if (!grand)
           break;
 
-        if (parent == grand->left)
+        if (parent == grand->Left)
         {
-          Node *uncle = grand->right;
-          if (uncle && uncle->data.color == Color::Red)
+          Node *uncle = grand->Right;
+          if (uncle && uncle->Value.Color == Color::Red)
           {
-            parent->data.color = Color::Black;
-            uncle->data.color = Color::Black;
-            grand->data.color = Color::Red;
+            parent->Value.Color = Color::Black;
+            uncle->Value.Color = Color::Black;
+            grand->Value.Color = Color::Red;
             z = grand;
           }
           else
           {
-            if (z == parent->right)
+            if (z == parent->Right)
             {
               z = parent;
               LeftRotate(z);
-              parent = z->parent;
-              grand = parent ? parent->parent : nullptr;
+              parent = z->Parent;
+              grand = parent ? parent->Parent : nullptr;
             }
             if (parent)
-              parent->data.color = Color::Black;
+              parent->Value.Color = Color::Black;
             if (grand)
             {
-              grand->data.color = Color::Red;
+              grand->Value.Color = Color::Red;
               RightRotate(grand);
             }
           }
         }
         else
         {
-          Node *uncle = grand->left;
-          if (uncle && uncle->data.color == Color::Red)
+          Node *uncle = grand->Left;
+          if (uncle && uncle->Value.Color == Color::Red)
           {
-            parent->data.color = Color::Black;
-            uncle->data.color = Color::Black;
-            grand->data.color = Color::Red;
+            parent->Value.Color = Color::Black;
+            uncle->Value.Color = Color::Black;
+            grand->Value.Color = Color::Red;
             z = grand;
           }
           else
           {
-            if (z == parent->left)
+            if (z == parent->Left)
             {
               z = parent;
               RightRotate(z);
-              parent = z->parent;
-              grand = parent ? parent->parent : nullptr;
+              parent = z->Parent;
+              grand = parent ? parent->Parent : nullptr;
             }
             if (parent)
-              parent->data.color = Color::Black;
+              parent->Value.Color = Color::Black;
             if (grand)
             {
-              grand->data.color = Color::Red;
+              grand->Value.Color = Color::Red;
               LeftRotate(grand);
             }
           }
         }
       }
       if (root)
-        root->data.color = Color::Black;
+        root->Value.Color = Color::Black;
     }
   };
 }

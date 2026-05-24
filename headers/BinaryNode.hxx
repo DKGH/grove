@@ -10,35 +10,35 @@ namespace Grove
   template <typename T>
   struct BinaryNode final
   {
-    T data;
-    BinaryNode<T> *left{nullptr};
-    BinaryNode<T> *right{nullptr};
-    BinaryNode<T> *parent{nullptr};
+    T Value;
+    BinaryNode<T> *Left{nullptr};
+    BinaryNode<T> *Right{nullptr};
+    BinaryNode<T> *Parent{nullptr};
 
     ~BinaryNode()
     {
-      delete left;
-      delete right;
+      delete Left;
+      delete Right;
     }
 
     bool IsLeaf() const noexcept
     {
-      return !left && !right;
+      return !Left && !Right;
     }
 
     const BinaryNode<T> *GetParent() const noexcept
     {
-      return parent;
+      return Parent;
     }
 
     BinaryNode<T> *GetParent() noexcept
     {
-      return parent;
+      return Parent;
     }
 
     bool IsRoot() const noexcept
     {
-      return parent == nullptr;
+      return Parent == nullptr;
     }
 
 #pragma region Breadth-First Traversal
@@ -51,11 +51,11 @@ namespace Grove
       {
         const BinaryNode<T> *current = queue.front();
         queue.erase(queue.begin());
-        result.push_back(current->data);
-        if (current->left)
-          queue.push_back(current->left);
-        if (current->right)
-          queue.push_back(current->right);
+        result.push_back(current->Value);
+        if (current->Left)
+          queue.push_back(current->Left);
+        if (current->Right)
+          queue.push_back(current->Right);
       }
       return result;
     }
@@ -67,15 +67,15 @@ namespace Grove
     vector<T> GetPreOrder() const
     {
       vector<T> result;
-      result.push_back(data);
-      if (left)
+      result.push_back(Value);
+      if (Left)
       {
-        const auto &leftValues = left->GetPreOrder();
+        const auto &leftValues = Left->GetPreOrder();
         result.insert(result.end(), leftValues.begin(), leftValues.end());
       }
-      if (right)
+      if (Right)
       {
-        const auto &rightValues = right->GetPreOrder();
+        const auto &rightValues = Right->GetPreOrder();
         result.insert(result.end(), rightValues.begin(), rightValues.end());
       }
       return result;
@@ -84,15 +84,15 @@ namespace Grove
     vector<T> GetInOrder() const
     {
       vector<T> result;
-      if (left)
+      if (Left)
       {
-        const auto &leftValues = left->GetInOrder();
+        const auto &leftValues = Left->GetInOrder();
         result.insert(result.end(), leftValues.begin(), leftValues.end());
       }
-      result.push_back(data);
-      if (right)
+      result.push_back(Value);
+      if (Right)
       {
-        const auto &rightValues = right->GetInOrder();
+        const auto &rightValues = Right->GetInOrder();
         result.insert(result.end(), rightValues.begin(), rightValues.end());
       }
       return result;
@@ -101,17 +101,17 @@ namespace Grove
     vector<T> GetPostOrder() const
     {
       vector<T> result;
-      if (left)
+      if (Left)
       {
-        const auto &leftValues = left->GetPostOrder();
+        const auto &leftValues = Left->GetPostOrder();
         result.insert(result.end(), leftValues.begin(), leftValues.end());
       }
-      if (right)
+      if (Right)
       {
-        const auto &rightValues = right->GetPostOrder();
+        const auto &rightValues = Right->GetPostOrder();
         result.insert(result.end(), rightValues.begin(), rightValues.end());
       }
-      result.push_back(data);
+      result.push_back(Value);
       return result;
     }
 
@@ -126,39 +126,39 @@ namespace Grove
       {
         const BinaryNode<T> *current = queue.front();
         queue.erase(queue.begin());
-        visitor(current->data);
-        if (current->left)
-          queue.push_back(current->left);
-        if (current->right)
-          queue.push_back(current->right);
+        visitor(current->Value);
+        if (current->Left)
+          queue.push_back(current->Left);
+        if (current->Right)
+          queue.push_back(current->Right);
       }
     }
 
     void VisitPreOrder(const function<void(const T &)> &visitor) const
     {
-      visitor(data);
-      if (left)
-        left->VisitPreOrder(visitor);
-      if (right)
-        right->VisitPreOrder(visitor);
+      visitor(Value);
+      if (Left)
+        Left->VisitPreOrder(visitor);
+      if (Right)
+        Right->VisitPreOrder(visitor);
     }
 
     void VisitInOrder(const function<void(const T &)> &visitor) const
     {
-      if (left)
-        left->VisitInOrder(visitor);
-      visitor(data);
-      if (right)
-        right->VisitInOrder(visitor);
+      if (Left)
+        Left->VisitInOrder(visitor);
+      visitor(Value);
+      if (Right)
+        Right->VisitInOrder(visitor);
     }
 
     void VisitPostOrder(const function<void(const T &)> &visitor) const
     {
-      if (left)
-        left->VisitPostOrder(visitor);
-      if (right)
-        right->VisitPostOrder(visitor);
-      visitor(data);
+      if (Left)
+        Left->VisitPostOrder(visitor);
+      if (Right)
+        Right->VisitPostOrder(visitor);
+      visitor(Value);
     }
 
 #pragma endregion

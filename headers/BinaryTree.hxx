@@ -27,9 +27,15 @@ namespace Grove
         for (size_t i{0}; i < n; ++i)
         {
             if (const size_t leftIndex = 2 * i + 1; leftIndex < n)
+            {
                 nodes[i]->left = nodes[leftIndex];
+                nodes[leftIndex]->parent = nodes[i];
+            }
             if (const size_t rightIndex = 2 * i + 2; rightIndex < n)
+            {
                 nodes[i]->right = nodes[rightIndex];
+                nodes[rightIndex]->parent = nodes[i];
+            }
         }
 
         return nodes[0];
@@ -54,7 +60,11 @@ namespace Grove
             return nullptr;
         BinaryNode<T> *newNode = new BinaryNode<T>{root->data, nullptr, nullptr};
         newNode->left = CopyBinaryTree(root->left);
+        if (newNode->left)
+            newNode->left->parent = newNode;
         newNode->right = CopyBinaryTree(root->right);
+        if (newNode->right)
+            newNode->right->parent = newNode;
         return newNode;
     }
 
@@ -103,17 +113,18 @@ namespace Grove
 #pragma region Binary Search Tree
 
     template <typename T>
-    void InsertIntoBinarySearchTree(BinaryNode<T> *&root, const T &value)
+    void InsertIntoBinarySearchTree(BinaryNode<T> *&root, const T &value, BinaryNode<T> *parent = nullptr)
     {
         if (!root)
         {
             root = new BinaryNode<T>{value, nullptr, nullptr};
+            root->parent = parent;
             return;
         }
         if (value < root->data)
-            InsertIntoBinarySearchTree(root->left, value);
+            InsertIntoBinarySearchTree(root->left, value, root);
         else
-            InsertIntoBinarySearchTree(root->right, value);
+            InsertIntoBinarySearchTree(root->right, value, root);
     }
 
     template <typename T>

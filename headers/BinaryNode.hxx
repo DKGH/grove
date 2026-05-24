@@ -8,11 +8,12 @@ using namespace std;
 namespace Grove
 {
   template <typename T>
-  struct BinaryNode
+  struct BinaryNode final
   {
     T data;
     BinaryNode<T> *left{nullptr};
     BinaryNode<T> *right{nullptr};
+    BinaryNode<T> *parent{nullptr};
 
     ~BinaryNode()
     {
@@ -23,6 +24,21 @@ namespace Grove
     bool IsLeaf() const noexcept
     {
       return !left && !right;
+    }
+
+    const BinaryNode<T> *GetParent() const noexcept
+    {
+      return parent;
+    }
+
+    BinaryNode<T> *GetParent() noexcept
+    {
+      return parent;
+    }
+
+    bool IsRoot() const noexcept
+    {
+      return parent == nullptr;
     }
 
 #pragma region Breadth-First Traversal

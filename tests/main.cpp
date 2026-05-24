@@ -7,8 +7,9 @@
 
 #include "TestTraversals.hxx"
 #include "TestBST.hxx"
-#include "TestSegmentTrees.hxx"
-#include "TestFenwickTrees.hxx"
+#include "TestSegmentTree.hxx"
+#include "TestFenwickTree.hxx"
+#include "TestRedBlackTree.hxx"
 
 int main(int argc, char *argv[])
 {

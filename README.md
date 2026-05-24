@@ -10,10 +10,11 @@ Generic C++ header only library for trees and tries. Requires C++ 20 or higher.
 
 - Binary Trees
 - Binary Search Trees
+- Segment Trees
 
 ## Usage
 
-Include the headers from the `headers/` directory in your project.
+Include the headers from the `headers/` directory in your project. For example:
 
 ```cpp
 #include "headers/BinaryTree.hxx"

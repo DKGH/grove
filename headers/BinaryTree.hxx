@@ -5,148 +5,20 @@
 #include <functional>
 #include <vector>
 
+#include "BinaryNode.hxx"
+
 using namespace std;
 
 namespace Grove
 {
-    template <typename T>
-    struct Node
-    {
-        T data;
-        Node<T> *left{nullptr};
-        Node<T> *right{nullptr};
-
-#pragma region Breadth-First Traversal
-
-        vector<T> GetLevelOrder() const
-        {
-            vector<T> result;
-            vector<const Node<T> *> queue{this};
-            while (!queue.empty())
-            {
-                const Node<T> *current = queue.front();
-                queue.erase(queue.begin());
-                result.push_back(current->data);
-                if (current->left)
-                    queue.push_back(current->left);
-                if (current->right)
-                    queue.push_back(current->right);
-            }
-            return result;
-        }
-
-#pragma endregion
-
-#pragma region Depth-First Traversals
-
-        vector<T> GetPreOrder() const
-        {
-            vector<T> result;
-            result.push_back(data);
-            if (left)
-            {
-                const auto &leftValues = left->GetPreOrder();
-                result.insert(result.end(), leftValues.begin(), leftValues.end());
-            }
-            if (right)
-            {
-                const auto &rightValues = right->GetPreOrder();
-                result.insert(result.end(), rightValues.begin(), rightValues.end());
-            }
-            return result;
-        }
-
-        vector<T> GetInOrder() const
-        {
-            vector<T> result;
-            if (left)
-            {
-                const auto &leftValues = left->GetInOrder();
-                result.insert(result.end(), leftValues.begin(), leftValues.end());
-            }
-            result.push_back(data);
-            if (right)
-            {
-                const auto &rightValues = right->GetInOrder();
-                result.insert(result.end(), rightValues.begin(), rightValues.end());
-            }
-            return result;
-        }
-
-        vector<T> GetPostOrder() const
-        {
-            vector<T> result;
-            if (left)
-            {
-                const auto &leftValues = left->GetPostOrder();
-                result.insert(result.end(), leftValues.begin(), leftValues.end());
-            }
-            if (right)
-            {
-                const auto &rightValues = right->GetPostOrder();
-                result.insert(result.end(), rightValues.begin(), rightValues.end());
-            }
-            result.push_back(data);
-            return result;
-        }
-
-#pragma endregion
-
-#pragma region Visitors
-
-        void VisitLevelOrder(const function<void(const T &)> &visitor) const
-        {
-            vector<const Node<T> *> queue{this};
-            while (!queue.empty())
-            {
-                const Node<T> *current = queue.front();
-                queue.erase(queue.begin());
-                visitor(current->data);
-                if (current->left)
-                    queue.push_back(current->left);
-                if (current->right)
-                    queue.push_back(current->right);
-            }
-        }
-
-        void VisitPreOrder(const function<void(const T &)> &visitor) const
-        {
-            visitor(data);
-            if (left)
-                left->VisitPreOrder(visitor);
-            if (right)
-                right->VisitPreOrder(visitor);
-        }
-
-        void VisitInOrder(const function<void(const T &)> &visitor) const
-        {
-            if (left)
-                left->VisitInOrder(visitor);
-            visitor(data);
-            if (right)
-                right->VisitInOrder(visitor);
-        }
-
-        void VisitPostOrder(const function<void(const T &)> &visitor) const
-        {
-            if (left)
-                left->VisitPostOrder(visitor);
-            if (right)
-                right->VisitPostOrder(visitor);
-            visitor(data);
-        }
-
-#pragma endregion
-    };
-
 #pragma region Binary Tree Creators
 
     template <typename T, typename InputIt>
-    Node<T> *GenerateBinaryTree(InputIt first, InputIt last)
+    BinaryNode<T> *GenerateBinaryTree(InputIt first, InputIt last)
     {
-        vector<Node<T> *> nodes;
+        vector<BinaryNode<T> *> nodes;
         for (; first != last; ++first)
-            nodes.push_back(new Node<T>{*first, nullptr, nullptr});
+            nodes.push_back(new BinaryNode<T>{*first, nullptr, nullptr});
 
         const size_t n{nodes.size()};
         if (n == 0)
@@ -164,23 +36,23 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *GenerateBinaryTree(initializer_list<T> &&elements)
+    BinaryNode<T> *GenerateBinaryTree(initializer_list<T> &&elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    Node<T> *GenerateBinaryTree(const vector<T> &elements)
+    BinaryNode<T> *GenerateBinaryTree(const vector<T> &elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    Node<T> *CopyBinaryTree(const Node<T> *root)
+    BinaryNode<T> *CopyBinaryTree(const BinaryNode<T> *root)
     {
         if (!root)
             return nullptr;
-        Node<T> *newNode = new Node<T>{root->data, nullptr, nullptr};
+        BinaryNode<T> *newNode = new BinaryNode<T>{root->data, nullptr, nullptr};
         newNode->left = CopyBinaryTree(root->left);
         newNode->right = CopyBinaryTree(root->right);
         return newNode;
@@ -190,7 +62,7 @@ namespace Grove
 
 #pragma region Destructors
     template <typename T>
-    void DeleteBinaryTree(Node<T> *root)
+    void DeleteBinaryTree(BinaryNode<T> *root)
     {
         if (root)
         {
@@ -201,16 +73,16 @@ namespace Grove
     }
 
     template <typename T>
-    bool DeleteNodeFromBinarySearchTree(Node<T> *&root, const T &value)
+    bool DeleteNodeFromBinarySearchTree(BinaryNode<T> *&root, const T &value)
     {
         if (!root)
             return false;
         if (root->data == value)
         {
-            Node<T> *temp = root;
+            BinaryNode<T> *temp = root;
             if (root->left && root->right)
             {
-                Node<T> *successor = root->right;
+                BinaryNode<T> *successor = root->right;
                 while (successor->left)
                     successor = successor->left;
                 root->data = successor->data;
@@ -231,11 +103,11 @@ namespace Grove
 #pragma region Binary Search Tree
 
     template <typename T>
-    void InsertIntoBinarySearchTree(Node<T> *&root, const T &value)
+    void InsertIntoBinarySearchTree(BinaryNode<T> *&root, const T &value)
     {
         if (!root)
         {
-            root = new Node<T>{value, nullptr, nullptr};
+            root = new BinaryNode<T>{value, nullptr, nullptr};
             return;
         }
         if (value < root->data)
@@ -245,25 +117,25 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
+    BinaryNode<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
     {
-        Node<T> *root = nullptr;
+        BinaryNode<T> *root = nullptr;
         for (const T &element : elements)
             InsertIntoBinarySearchTree(root, element);
         return root;
     }
 
     template <typename T>
-    Node<T> *GenerateBinarySearchTree(const Node<T> *node)
+    BinaryNode<T> *GenerateBinarySearchTree(const BinaryNode<T> *node)
     {
-        Node<T> *root = nullptr;
+        BinaryNode<T> *root = nullptr;
         node->VisitInOrder([&](const T &value)
                            { InsertIntoBinarySearchTree(root, value); });
         return root;
     }
 
     template <typename T>
-    bool IsBinarySearchTree(const Node<T> *node)
+    bool IsBinarySearchTree(const BinaryNode<T> *node)
     {
         if (!node)
             return true;
@@ -275,12 +147,12 @@ namespace Grove
     }
 
     template <typename T>
-    Node<T> *BinarySearch(const Node<T> *root, const T &value)
+    BinaryNode<T> *BinarySearch(const BinaryNode<T> *root, const T &value)
     {
         if (!root)
             return nullptr;
         if (root->data == value)
-            return const_cast<Node<T> *>(root);
+            return const_cast<BinaryNode<T> *>(root);
         return value < root->data
                    ? BinarySearch(root->left, value)
                    : BinarySearch(root->right, value);

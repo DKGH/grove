@@ -14,6 +14,12 @@ namespace Grove
     BinaryNode<T> *left{nullptr};
     BinaryNode<T> *right{nullptr};
 
+    ~BinaryNode()
+    {
+      delete left;
+      delete right;
+    }
+
     bool IsLeaf() const noexcept
     {
       return !left && !right;

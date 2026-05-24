@@ -8,10 +8,16 @@ using namespace std;
 
 bool TestGenerateSegmentTree()
 {
-  return Grove::GenerateSegmentTree({1, 2, 3, 4, 5, 6, 7})->data == 28;
+  return Grove::SegmentTree<int>({1, 2, 3, 4, 5, 6, 7}).GetRangeSum(0, 6) == 28;
 }
 
 TEST_CASE("Segment tree tests", "[segment_tree]")
 {
-  REQUIRE(TestGenerateSegmentTree());
+  Grove::SegmentTree<int> tree({1, 2, 3, 4, 5, 6, 7});
+  const int totalSum = tree.GetRangeSum(0, 6);
+  REQUIRE(totalSum == 28);
+
+  tree.Update(3, 10);
+  const int updatedSum = tree.GetRangeSum(0, 6);
+  REQUIRE(updatedSum == 34);
 }

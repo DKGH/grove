@@ -5,9 +5,10 @@
 
 #include "catch2/catch_session.hpp"
 
-#include "BinaryTree/traversal.hxx"
-#include "BinaryTree/bst.hxx"
-#include "BinaryTree/segmentTrees.hxx"
+#include "TestTraversals.hxx"
+#include "TestBST.hxx"
+#include "TestSegmentTrees.hxx"
+#include "TestFenwickTrees.hxx"
 
 int main(int argc, char *argv[])
 {

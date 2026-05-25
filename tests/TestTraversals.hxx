@@ -16,10 +16,7 @@ vector<int> TestGetPreOrder()
 vector<int> TestGetInOrder()
 {
   vector<int> test{1, 2, 3, 4, 5, 6, 7};
-  Grove::BinaryNode<int> *root = Grove::GenerateBinaryTree(test);
-  const vector<int> &answer = root->GetInOrder();
-  delete root;
-  return answer;
+  return Grove::GenerateBinaryTree(test)->GetInOrder();
 }
 
 vector<int> TestGetPostOrder()
@@ -29,41 +26,33 @@ vector<int> TestGetPostOrder()
 
 string TestVisitLevelOrder()
 {
-  Grove::BinaryNode<int> *root = Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7});
   stringstream ss;
-  root->VisitLevelOrder([&ss](const int &value)
-                        { ss << '\'' << value << "' "; });
-  delete root;
+  Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7})->VisitLevelOrder([&ss](const int &value)
+                                                                               { ss << '\'' << value << "' "; });
   return ss.str();
 }
 
 string TestVisitPreOrder()
 {
-  Grove::BinaryNode<int> *root = Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7});
   stringstream ss;
-  root->VisitPreOrder([&ss](const int &value)
-                      { ss << '\'' << value << "' "; });
-  delete root;
+  Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7})->VisitPreOrder([&ss](const int &value)
+                                                                             { ss << '\'' << value << "' "; });
   return ss.str();
 }
 
 string TestVisitInOrder()
 {
-  Grove::BinaryNode<int> *root = Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7});
   stringstream ss;
-  root->VisitInOrder([&ss](const int &value)
-                     { ss << '\'' << value << "' "; });
-  delete root;
+  Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7})->VisitInOrder([&ss](const int &value)
+                                                                            { ss << '\'' << value << "' "; });
   return ss.str();
 }
 
 string TestVisitPostOrder()
 {
-  Grove::BinaryNode<int> *root = Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7});
   stringstream ss;
-  root->VisitPostOrder([&ss](const int &value)
-                       { ss << '\'' << value << "' "; });
-  delete root;
+  Grove::GenerateBinaryTree(vector<int>{1, 2, 3, 4, 5, 6, 7})->VisitPostOrder([&ss](const int &value)
+                                                                              { ss << '\'' << value << "' "; });
   return ss.str();
 }
 

@@ -14,7 +14,7 @@ namespace Grove
 #pragma region Binary Tree Creators
 
     template <typename T, typename InputIt>
-    BinaryNode<T> *GenerateBinaryTree(InputIt first, InputIt last)
+    unique_ptr<BinaryNode<T>> GenerateBinaryTree(InputIt first, InputIt last)
     {
         vector<BinaryNode<T> *> nodes;
         for (; first != last; ++first)
@@ -38,23 +38,23 @@ namespace Grove
             }
         }
 
-        return nodes[0];
+        return unique_ptr<BinaryNode<T>>(nodes[0]);
     }
 
     template <typename T>
-    BinaryNode<T> *GenerateBinaryTree(initializer_list<T> &&elements)
+    unique_ptr<BinaryNode<T>> GenerateBinaryTree(initializer_list<T> &&elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    BinaryNode<T> *GenerateBinaryTree(const vector<T> &elements)
+    unique_ptr<BinaryNode<T>> GenerateBinaryTree(const vector<T> &elements)
     {
         return GenerateBinaryTree<T>(elements.begin(), elements.end());
     }
 
     template <typename T>
-    BinaryNode<T> *CopyBinaryTree(const BinaryNode<T> *root)
+    unique_ptr<BinaryNode<T>> CopyBinaryTree(const unique_ptr<BinaryNode<T>> &root)
     {
         if (!root)
             return nullptr;
@@ -71,16 +71,6 @@ namespace Grove
 #pragma endregion
 
 #pragma region Destructors
-    template <typename T>
-    void DeleteBinaryTree(BinaryNode<T> *root)
-    {
-        if (root)
-        {
-            DeleteBinaryTree(root->Left);
-            DeleteBinaryTree(root->Right);
-            delete root;
-        }
-    }
 
     template <typename T>
     bool DeleteNodeFromBinarySearchTree(BinaryNode<T> *&root, const T &value)
@@ -128,21 +118,27 @@ namespace Grove
     }
 
     template <typename T>
-    BinaryNode<T> *GenerateBinarySearchTree(const initializer_list<T> &elements)
+    unique_ptr<BinaryNode<T>> GenerateBinarySearchTree(const initializer_list<T> &elements)
     {
-        BinaryNode<T> *root = nullptr;
+        BinaryNode<T> *root{nullptr};
         for (const T &element : elements)
             InsertIntoBinarySearchTree(root, element);
-        return root;
+        return unique_ptr<BinaryNode<T>>(root);
     }
 
     template <typename T>
-    BinaryNode<T> *GenerateBinarySearchTree(const BinaryNode<T> *node)
+    unique_ptr<BinaryNode<T>> GenerateBinarySearchTree(const BinaryNode<T> *node)
     {
         BinaryNode<T> *root = nullptr;
         node->VisitInOrder([&](const T &value)
                            { InsertIntoBinarySearchTree(root, value); });
-        return root;
+        return unique_ptr<BinaryNode<T>>(root);
+    }
+
+    template <typename T>
+    unique_ptr<BinaryNode<T>> GenerateBinarySearchTree(const unique_ptr<BinaryNode<T>> &node)
+    {
+        return GenerateBinarySearchTree(node.get());
     }
 
     template <typename T>
@@ -158,12 +154,18 @@ namespace Grove
     }
 
     template <typename T>
-    BinaryNode<T> *BinarySearch(const BinaryNode<T> *root, const T &value)
+    bool IsBinarySearchTree(const unique_ptr<BinaryNode<T>> &node)
+    {
+        return IsBinarySearchTree(node.get());
+    }
+
+    template <typename T>
+    unique_ptr<BinaryNode<T>> BinarySearch(unique_ptr<BinaryNode<T>> &root, const T &value)
     {
         if (!root)
             return nullptr;
         if (root->Value == value)
-            return const_cast<BinaryNode<T> *>(root);
+            return root;
         return value < root->Value
                    ? BinarySearch(root->Left, value)
                    : BinarySearch(root->Right, value);

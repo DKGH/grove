@@ -21,7 +21,9 @@ Include the headers from the `headers/` directory in your project. For example:
 ```cpp
 #include "headers/BinaryTree.hxx"
 
-shared_ptr<BinaryTree> tree = make_shared<BinaryTree>(Grove::GenerateBinaryTree({1, 2, 3, 4, 5, 6, 7}));
+const shared_ptr<Grove::BinaryNode<int>> &root =
+    shared_ptr<Grove::BinaryNode<int>>(Grove::GenerateBinaryTree({1, 2, 3, 4, 5, 6, 7}));
+return root->GetPreOrder();
 ```
 
 Then use the library types and functions directly in your code.

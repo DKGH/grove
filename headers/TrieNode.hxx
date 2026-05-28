@@ -1,3 +1,9 @@
+#pragma once
+
+#include <unordered_map>
+
+using namespace std;
+
 namespace Grove
 {
   template <typename T>

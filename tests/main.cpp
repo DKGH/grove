@@ -10,6 +10,7 @@
 #include "TestSegmentTree.hxx"
 #include "TestFenwickTree.hxx"
 #include "TestRedBlackTree.hxx"
+#include "TestStringTrie.hxx"
 
 int main(int argc, char *argv[])
 {

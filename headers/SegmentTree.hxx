@@ -2,18 +2,21 @@
 
 #include <iterator>
 #include <vector>
+#include <functional>
 
 using namespace std;
 
 namespace Grove
 {
-  template <typename T>
+  template <typename T, typename Op = std::plus<T>>
   class SegmentTree final
   {
     vector<T> tree;
     size_t elementCount{0};
+    Op op{};
+    T identity{};
 
-    static T BuildTree(const vector<T> &elements, size_t left, size_t right, size_t index, vector<T> &tree)
+    T BuildTree(const vector<T> &elements, size_t left, size_t right, size_t index)
     {
       if (left == right)
       {
@@ -22,40 +25,46 @@ namespace Grove
       }
 
       const size_t mid = left + (right - left) / 2;
-      const T leftSum = BuildTree(elements, left, mid, index * 2 + 1, tree);
-      const T rightSum = BuildTree(elements, mid + 1, right, index * 2 + 2, tree);
-      tree[index] = leftSum + rightSum;
+      const T leftVal = BuildTree(elements, left, mid, index * 2 + 1);
+      const T rightVal = BuildTree(elements, mid + 1, right, index * 2 + 2);
+      tree[index] = op(leftVal, rightVal);
       return tree[index];
     }
 
-    static vector<T> GenerateSegmentTree(const vector<T> &elements)
-    {
-      if (elements.empty())
-        return {};
-
-      const size_t n = elements.size();
-      vector<T> tree(4 * n);
-      BuildTree(elements, 0, n - 1, 0, tree);
-      return tree;
-    }
-
     template <typename InputIt>
-    static vector<T> GenerateSegmentTree(const InputIt &first, const InputIt &last)
+    static vector<T> ToVector(const InputIt &first, const InputIt &last)
     {
-      vector<T> elements(first, last);
-      return GenerateSegmentTree(elements);
+      return vector<T>(first, last);
     }
 
-    T GetRangeSumHelper(size_t nodeIndex, size_t nodeLeft, size_t nodeRight, size_t queryLeft, size_t queryRight) const
+    T QueryHelper(size_t nodeIndex, size_t nodeLeft, size_t nodeRight, size_t queryLeft, size_t queryRight) const
     {
       if (nodeLeft > queryRight || nodeRight < queryLeft)
-        return 0;
+        return identity;
       if (queryLeft <= nodeLeft && nodeRight <= queryRight)
         return tree[nodeIndex];
 
       const size_t mid = nodeLeft + (nodeRight - nodeLeft) / 2;
-      return GetRangeSumHelper(nodeIndex * 2 + 1, nodeLeft, mid, queryLeft, queryRight) +
-             GetRangeSumHelper(nodeIndex * 2 + 2, mid + 1, nodeRight, queryLeft, queryRight);
+      return op(QueryHelper(nodeIndex * 2 + 1, nodeLeft, mid, queryLeft, queryRight),
+                QueryHelper(nodeIndex * 2 + 2, mid + 1, nodeRight, queryLeft, queryRight));
+    }
+
+    T UpdateHelper(size_t nodeIndex, size_t nodeLeft, size_t nodeRight, size_t index, const T &value)
+    {
+      if (nodeLeft == nodeRight)
+      {
+        tree[nodeIndex] = value;
+        return tree[nodeIndex];
+      }
+
+      const size_t mid = nodeLeft + (nodeRight - nodeLeft) / 2;
+      if (index <= mid)
+        UpdateHelper(nodeIndex * 2 + 1, nodeLeft, mid, index, value);
+      else
+        UpdateHelper(nodeIndex * 2 + 2, mid + 1, nodeRight, index, value);
+
+      tree[nodeIndex] = op(tree[nodeIndex * 2 + 1], tree[nodeIndex * 2 + 2]);
+      return tree[nodeIndex];
     }
 
   public:
@@ -63,19 +72,34 @@ namespace Grove
     SegmentTree() = default;
 
     template <typename InputIt>
-    SegmentTree(const InputIt &first, const InputIt &last)
-        : tree(GenerateSegmentTree(first, last)), elementCount(distance(first, last))
+    SegmentTree(const InputIt &first, const InputIt &last, Op op = Op{}, T identity = T())
+        : op(op), identity(identity), elementCount(distance(first, last))
     {
+      const vector<T> elements = ToVector(first, last);
+      if (elements.empty())
+        return;
+
+      tree.assign(4 * elementCount, identity);
+      BuildTree(elements, 0, elementCount - 1, 0);
     }
 
-    SegmentTree(initializer_list<T> &&elements)
-        : tree(GenerateSegmentTree(elements.begin(), elements.end())), elementCount(elements.size())
+    SegmentTree(initializer_list<T> &&elements, Op op = Op{}, T identity = T())
+        : op(op), identity(identity), elementCount(elements.size())
     {
+      if (elements.size() == 0)
+        return;
+      tree.assign(4 * elementCount, identity);
+      const vector<T> elems(elements.begin(), elements.end());
+      BuildTree(elems, 0, elementCount - 1, 0);
     }
 
-    SegmentTree(const vector<T> &elements)
-        : tree(GenerateSegmentTree(elements)), elementCount(elements.size())
+    SegmentTree(const vector<T> &elements, Op op = Op{}, T identity = T())
+        : op(op), identity(identity), elementCount(elements.size())
     {
+      if (elements.empty())
+        return;
+      tree.assign(4 * elementCount, identity);
+      BuildTree(elements, 0, elementCount - 1, 0);
     }
 
     SegmentTree(const SegmentTree &other) = default;
@@ -85,44 +109,20 @@ namespace Grove
     ~SegmentTree() = default;
 #pragma endregion
 
-    T GetRangeSum(size_t left, size_t right) const
+    T GetRangeValue(size_t left, size_t right) const
     {
       if (tree.empty() || left > right || right >= elementCount)
-        return 0;
+        return identity;
 
-      return GetRangeSumHelper(0, 0, elementCount - 1, left, right);
+      return QueryHelper(0, 0, elementCount - 1, left, right);
     }
 
     void Update(size_t index, const T &value)
     {
-      if (index >= elementCount)
+      if (index >= elementCount || tree.empty())
         return;
 
-      const T oldValue = GetRangeSum(index, index);
-      const T delta = value - oldValue;
-
-      size_t nodeIndex = 0;
-      size_t nodeLeft = 0;
-      size_t nodeRight = elementCount - 1;
-
-      while (true)
-      {
-        tree[nodeIndex] += delta;
-        if (nodeLeft == nodeRight)
-          break;
-
-        const size_t mid = nodeLeft + (nodeRight - nodeLeft) / 2;
-        if (index <= mid)
-        {
-          nodeIndex = nodeIndex * 2 + 1;
-          nodeRight = mid;
-        }
-        else
-        {
-          nodeIndex = nodeIndex * 2 + 2;
-          nodeLeft = mid + 1;
-        }
-      }
+      UpdateHelper(0, 0, elementCount - 1, index, value);
     }
   };
 }

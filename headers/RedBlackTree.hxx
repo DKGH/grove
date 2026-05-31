@@ -101,9 +101,8 @@ namespace Grove
       return nullptr;
     }
 
-    void LeftRotate(BinaryNode<RedBlackNodeData<T>> *x)
+    void LeftRotate(Node *x)
     {
-      using Node = BinaryNode<RedBlackNodeData<T>>;
       Node *y = x->Right;
       if (!y)
         return;
@@ -121,9 +120,8 @@ namespace Grove
       x->Parent = y;
     }
 
-    void RightRotate(BinaryNode<RedBlackNodeData<T>> *y)
+    void RightRotate(Node *y)
     {
-      using Node = BinaryNode<RedBlackNodeData<T>>;
       Node *x = y->Left;
       if (!x)
         return;
@@ -141,9 +139,8 @@ namespace Grove
       y->Parent = x;
     }
 
-    void InsertFixup(BinaryNode<RedBlackNodeData<T>> *z)
+    void InsertFixup(Node *z)
     {
-      using Node = BinaryNode<RedBlackNodeData<T>>;
       while (z->Parent && z->Parent->Value.Color == Color::Red)
       {
         Node *parent = z->Parent;

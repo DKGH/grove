@@ -1,25 +1,30 @@
 #pragma once
 
+#include <functional>
 #include <iterator>
+#include <limits>
 #include <vector>
 
 using namespace std;
 
 namespace Grove
 {
-  template <typename T>
+  template <typename T, typename Op = std::plus<T>>
   class FenwickTree final
   {
-    vector<T> tree; // 1-based internal binary indexed tree
+    vector<T> tree;   // 1-based internal binary indexed tree
+    vector<T> values; // underlying point values (0-based)
     size_t elementCount{0};
+    Op op{};
+    T identity{};
 
-    static vector<T> GenerateFenwickTree(const vector<T> &elements)
+    static vector<T> GenerateFenwickTree(const vector<T> &elements, const Op &op, const T &identity)
     {
       if (elements.empty())
         return {};
 
       const size_t n = elements.size();
-      vector<T> bit(n + 1);
+      vector<T> bit(n + 1, identity);
 
       for (size_t i = 1; i <= n; ++i)
         bit[i] = elements[i - 1];
@@ -28,44 +33,44 @@ namespace Grove
       {
         const size_t j = i + (i & -i);
         if (j <= n)
-          bit[j] += bit[i];
+          bit[j] = op(bit[j], bit[i]);
       }
 
       return bit;
     }
 
     template <typename InputIt>
-    static vector<T> GenerateFenwickTree(const InputIt &first, const InputIt &last)
+    static vector<T> GenerateFenwickTree(const InputIt &first, const InputIt &last, const Op &op, const T &identity)
     {
       vector<T> elements(first, last);
-      return GenerateFenwickTree(elements);
+      return GenerateFenwickTree(elements, op, identity);
     }
 
-    T GetPrefixSumHelper(size_t index) const
+    T GetPrefixHelper(size_t index) const
     {
       if (tree.empty() || index >= elementCount)
-        return 0;
+        return identity;
 
-      T result = 0;
-      size_t i = index + 1; // convert to 1-based
+      T result = identity;
+      size_t i = index + 1;
       while (i > 0)
       {
-        result += tree[i];
+        result = op(result, tree[i]);
         i -= (i & -i);
       }
       return result;
     }
 
-    void AddHelper(size_t index, const T &delta)
+    void AddHelper(size_t index, const T &value)
     {
       if (tree.empty() || index >= elementCount)
         return;
 
-      size_t i = index + 1; // convert to 1-based
+      size_t i = index + 1;
       const size_t n = elementCount;
       while (i <= n)
       {
-        tree[i] += delta;
+        tree[i] = op(tree[i], value);
         i += (i & -i);
       }
     }
@@ -75,18 +80,18 @@ namespace Grove
     FenwickTree() = default;
 
     template <typename InputIt>
-    FenwickTree(const InputIt &first, const InputIt &last)
-        : tree(GenerateFenwickTree(first, last)), elementCount(distance(first, last))
+    FenwickTree(const InputIt &first, const InputIt &last, Op op_ = Op{}, T identity_ = T{})
+        : tree(GenerateFenwickTree(first, last, op_, identity_)), values(first, last), elementCount(distance(first, last)), op(op_), identity(identity_)
     {
     }
 
-    FenwickTree(initializer_list<T> &&elements)
-        : tree(GenerateFenwickTree(elements.begin(), elements.end())), elementCount(elements.size())
+    FenwickTree(initializer_list<T> &&elements, Op op_ = Op{}, T identity_ = T{})
+        : tree(GenerateFenwickTree(elements.begin(), elements.end(), op_, identity_)), values(elements.begin(), elements.end()), elementCount(elements.size()), op(op_), identity(identity_)
     {
     }
 
-    FenwickTree(const vector<T> &elements)
-        : tree(GenerateFenwickTree(elements)), elementCount(elements.size())
+    FenwickTree(const vector<T> &elements, Op op_ = Op{}, T identity_ = T{})
+        : tree(GenerateFenwickTree(elements, op_, identity_)), values(elements), elementCount(elements.size()), op(op_), identity(identity_)
     {
     }
 
@@ -97,20 +102,23 @@ namespace Grove
     ~FenwickTree() = default;
 #pragma endregion
 
-    T GetPrefixSum(size_t index) const
+    T GetPrefixValue(size_t index) const
     {
       if (tree.empty() || index >= elementCount)
-        return 0;
+        return identity;
 
-      return GetPrefixSumHelper(index);
+      return GetPrefixHelper(index);
     }
 
-    T GetRangeSum(size_t left, size_t right) const
+    T GetRangeValue(size_t left, size_t right) const
     {
-      if (tree.empty() || left > right || right >= elementCount)
-        return 0;
+      if (values.empty() || left > right || right >= elementCount)
+        return identity;
 
-      return GetPrefixSumHelper(right) - (left == 0 ? 0 : GetPrefixSumHelper(left - 1));
+      T result = identity;
+      for (size_t i = left; i <= right; ++i)
+        result = op(result, values[i]);
+      return result;
     }
 
     void Update(size_t index, const T &value)
@@ -118,14 +126,22 @@ namespace Grove
       if (index >= elementCount)
         return;
 
-      const T oldValue = GetRangeSum(index, index);
-      const T delta = value - oldValue;
-      AddHelper(index, delta);
+      values[index] = value;
+      tree = GenerateFenwickTree(values, op, identity);
     }
 
-    void Add(size_t index, const T &delta)
+    void Add(size_t index, const T &value)
     {
-      AddHelper(index, delta);
+      if (index >= elementCount)
+        return;
+
+      values[index] = op(values[index], value);
+      AddHelper(index, value);
     }
+
+    size_t Size() const { return elementCount; }
   };
+
+  template <typename T>
+  using FenwickTreeSum = FenwickTree<T, std::plus<T>>;
 }

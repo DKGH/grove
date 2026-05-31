@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cassert>
+#include <memory>
+#include <type_traits>
 #include "TrieNode.hxx"
 
 namespace Grove
@@ -10,6 +13,14 @@ namespace Grove
   private:
     FixedTrieNode<T, N> root;
 
+    static size_t ToIndex(T value) noexcept
+    {
+      if constexpr (std::is_same_v<std::remove_cv_t<T>, char>)
+        return static_cast<size_t>(value - 'a');
+
+      return static_cast<size_t>(value);
+    }
+
   public:
     template <typename InputIt>
     void Insert(InputIt first, InputIt last)
@@ -17,10 +28,13 @@ namespace Grove
       FixedTrieNode<T, N> *current = &root;
       for (auto it = first; it != last; ++it)
       {
-        if (current->Children.find(*it) == current->Children.end())
-          current->Children[*it] = FixedTrieNode<T, N>{};
+        const size_t index = ToIndex(*it);
+        assert(index < N);
 
-        current = &current->Children[*it];
+        if (!current->Children[index])
+          current->Children[index] = make_unique<FixedTrieNode<T, N>>();
+
+        current = current->Children[index].get();
       }
       current->IsEndOfWord = true;
     }
@@ -49,11 +63,13 @@ namespace Grove
         if (!current)
           return false;
 
-        const auto childIt = current->Children.find(*it);
-        if (childIt == current->Children.end())
+        const size_t index = ToIndex(*it);
+        if (index >= N)
           return false;
 
-        current = &childIt->second;
+        current = current->Children[index].get();
+        if (!current)
+          return false;
       }
       return current && current->IsEndOfWord;
     }

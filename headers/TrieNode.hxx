@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <memory>
+#include <type_traits>
 #include <unordered_map>
 
 using namespace std;
@@ -17,7 +19,7 @@ namespace Grove
   template <typename T, size_t N>
   struct FixedTrieNode final
   {
-    array<TrieNode<T>, N> Children;
+    array<unique_ptr<FixedTrieNode<T, N>>, N> Children;
     bool IsEndOfWord{false};
   };
 }
